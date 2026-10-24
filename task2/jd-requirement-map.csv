@@ -1,0 +1,8 @@
+requirement,source_jd,existing_teaching,status,action
+MLOps pipelines: training deployment monitoring,JD1,DS304 Machine Learning; CS307 Cloud Computing,Absent as a practised topic (hypothesis: check DS304 and CS307 handouts),ADD NEW2
+MLflow Kubeflow Airflow,JD1,None seen in the five handouts read,Unknown until DS304 and DS307 handouts are read,Verify then decide
+Model monitoring and explainability,JD1,DS306 and DS311 handouts list none,Absent from those handouts (observed),ADD NEW2
+Cloud platforms AWS and Databricks,JD1,CS307 Cloud Computing; DS307 Big Data Systems,Present; may need more practice (check handouts),KEEP; practise inside NEW2
+Container and Kubernetes security,JD2,CS415 handout has no container or Kubernetes lectures (cloud security only via a 10% external Azure certificate),Container security absent (observed; the handout's own gap table says so); cloud security present only as a certificate,ADD NEW3
+Scripting for automation (Python or Bash),JD2,DS202 Industry Coding Practice (Python/R),Present,KEEP
+Prompt engineering and LLM applications,JD3,DS306 and DS311 handouts list none,Prompting is absent from the DL and NLP handouts (observed); RAG and tool use are not confirmed by JD3,ADD NEW1

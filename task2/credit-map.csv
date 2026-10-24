@@ -1,0 +1,53 @@
+semester,code,course,credits,status
+I,CS101,Computer Programming,4,completed
+I,MT102,Engineering Graphics,3,completed
+I,EG101,English Language Skills,3,completed
+I,CH102,Environmental Sciences,2,completed
+I,HS101,Essence of Indian Traditional Knowledge,0,completed
+I,MA101,Linear Algebra and Ordinary Differential Equations,3,completed
+I,PHY101,Physics,5,completed
+II,EC101,Basic Electronics,4,completed
+II,CH101,Chemistry,4,completed
+II,CS102,Data Structures,4,completed
+II,MT101,Digital Fabrication,3,completed
+II,MA102,Higher Calculus,3,completed
+II,DS101,Introduction to AI and DS,3,completed
+II,EG102,Professional Communication,3,completed
+III,CS203,Design and Analysis of Algorithms,3,completed
+III,MA202,Discrete Mathematics,3,completed
+III,MG201,Engineering Economics and Management,3,completed
+III,MA201,Integral Transforms and Probability & Statistics,3,completed
+III,EC201,Introduction to IoT,3,completed
+III,CS201,Object Oriented Programming Concepts,4,completed
+III,CR201,Power Skills-I,1,completed
+III,CS202,Theory of Computation,3,completed
+IV,CS204,Computer Organization and Architecture,3,completed
+IV,DS203,Data Science,3,completed
+IV,CS206,Database Management Systems,4,completed
+IV,HS201,Dynamics of Social Change,3,completed
+IV,EC102,Fundamentals of Signal Processing,3,completed
+IV,DS202,Industry Coding Practice (Python/R),3,completed
+IV,CR202,Power Skills-II,1,completed
+IV,CS205,Web-Enabled Technologies,4,completed
+Summer II,IP201,Internship-I,3,completed
+V,DS303,Blockchain Technology,3,completed
+V,HS301,Constitution of India,0,completed
+V,DS304,Machine Learning,4,completed
+V,CS302,Operating Systems,4,completed
+V,CR301,Power Skills-III,1,completed
+V,CS301,Principles of Cryptography,3,completed
+V,CS303,Programming Language and Compiler Construction,3,completed
+V,CS304,Software Engineering,3,completed
+VI,DS307,Big Data Systems,3,completed
+VI,CS307,Cloud Computing,4,completed
+VI,CS306,Computer Networks,4,completed
+VI,CS305,Computer Vision,3,completed
+VI,CR302,Power Skills-IV,1,completed
+VI,SP301,Special Project,3,completed
+VI,DS201,Artificial Intelligence,3,completed
+VII,CS415,Ethical Hacking,3,registered
+VII,DS306,Deep Learning,4,registered
+VII,DS311,Natural Language Processing,3,registered
+VII,DS401,Human Computer Interaction,3,registered
+VII,MG401,Introduction to Entrepreneurship,3,registered
+VIII,IP-2,Internship-II (code to be confirmed),15,planned

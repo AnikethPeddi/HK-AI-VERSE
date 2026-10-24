@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Credit calculator: CSE proposal (student work)</title>
+<style>
+:root{--bg:#f2f4f7;--surface:#fff;--ink:#1b2430;--muted:#5b6675;--line:#d5dbe3;--blue:#1f4e8c;--red:#a8322f;--green:#2a7048;--amber:#8a5a00;color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme=light]){--bg:#12171d;--surface:#1b222b;--ink:#e6ebf1;--muted:#9aa6b4;--line:#2f3945;--blue:#7fb0f0;--red:#f08a86;--green:#6fcf97;--amber:#e3b04b;color-scheme:dark}}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 "Segoe UI",system-ui,sans-serif;padding:16px}
+main{max-width:1000px;margin:0 auto}
+h1{font-size:1.4rem;margin:0 0 4px}
+p.note{color:var(--muted);margin:0 0 16px;max-width:70ch}
+.sum{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:16px}
+.sum div{background:var(--surface);padding:10px 12px}
+.sum b{display:block;font-size:1.5rem;font-variant-numeric:tabular-nums}
+.sum span{color:var(--muted);font-size:.85rem}
+.ok{color:var(--green)}.bad{color:var(--red)}
+.bar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px}
+select,input{font:inherit;padding:6px 8px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:4px}
+:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.wrap{overflow-x:auto;border:1px solid var(--line);background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:640px}
+th,td{text-align:left;padding:7px 10px;border-bottom:1px solid var(--line)}
+th{font-weight:600;background:var(--bg)}
+td.n{text-align:right;font-variant-numeric:tabular-nums}
+tr.UPDATE td:first-child{box-shadow:inset 3px 0 var(--amber)}
+tr.REDUCE td:first-child{box-shadow:inset 3px 0 var(--red)}
+tr.ADD td:first-child{box-shadow:inset 3px 0 var(--green)}
+td input{width:56px}
+.tag{color:var(--muted);font-size:.85rem}
+</style>
+</head>
+<body>
+<main>
+<h1>CSE credit calculator</h1>
+<p class="note">Student proposal, not an official syllabus revision. Base credits come from the course list in credit-map.csv (136 completed, 16 registered, 15 planned). Change an action or the credit amounts to see the totals update. Affected credits count full credits of UPDATE courses, credits removed by REDUCE and credits added by ADD.</p>
+
+<div class="sum" aria-live="polite">
+<div><b id="base">0</b><span>Base credits</span></div>
+<div><b id="rem">0</b><span>Credits removed</span></div>
+<div><b id="add">0</b><span>Credits added</span></div>
+<div><b id="tot">0</b><span>New total</span></div>
+<div><b id="bal">0</b><span id="balt">Balance</span></div>
+<div><b id="aff">0</b><span id="pct">Affected</span></div>
+</div>
+
+<div class="wrap" style="margin-bottom:16px"><table style="min-width:520px"><thead><tr><th>Semester</th><th>Base</th><th>Removed</th><th>Added</th><th>Proposed</th></tr></thead><tbody id="sems"></tbody></table></div>
+<div class="bar">
+<label>Semester <select id="fs"><option value="">All</option></select></label>
+<label>Action <select id="fa"><option value="">All</option><option>KEEP</option><option>UPDATE</option><option>REDUCE</option><option>ADD</option></select></label>
+<label>Search <input id="q" type="search" placeholder="Code or title"></label>
+</div>
+
+<div class="wrap"><table>
+<thead><tr><th>Sem</th><th>Code</th><th>Course</th><th>Credits</th><th>Action</th><th>Change</th></tr></thead>
+<tbody id="rows"></tbody>
+</table></div>
+<p class="tag">Targets: affected credits between 20% and 25% of the base, and a balance of 0 so the total stays the same. Check minimum-credit and category rules in your regulations before relying on any change.</p>
+</main>
+<script>
+const D=[
+["I","CS101","Computer Programming",4],["I","MT102","Engineering Graphics",3],["I","EG101","English Language Skills",3],["I","CH102","Environmental Sciences",2],["I","HS101","Essence of Indian Traditional Knowledge",0],["I","MA101","Linear Algebra and ODE",3],["I","PHY101","Physics",5,"REDUCE",1],
+["II","EC101","Basic Electronics",4,"REDUCE",1],["II","CH101","Chemistry",4],["II","CS102","Data Structures",4],["II","MT101","Digital Fabrication",3],["II","MA102","Higher Calculus",3],["II","DS101","Introduction to AI and DS",3],["II","EG102","Professional Communication",3],
+["III","CS203","Design and Analysis of Algorithms",3],["III","MA202","Discrete Mathematics",3],["III","MG201","Engineering Economics and Management",3,"REDUCE",1],["III","MA201","Integral Transforms and Probability & Statistics",3],["III","EC201","Introduction to IoT",3],["III","CS201","Object Oriented Programming Concepts",4],["III","CR201","Power Skills-I",1],["III","CS202","Theory of Computation",3],
+["IV","CS204","Computer Organization and Architecture",3],["IV","DS203","Data Science",3],["IV","CS206","Database Management Systems",4],["IV","HS201","Dynamics of Social Change",3,"REDUCE",1],["IV","EC102","Fundamentals of Signal Processing",3,"REDUCE",3],["IV","DS202","Industry Coding Practice",3],["IV","CR202","Power Skills-II",1],["IV","CS205","Web-Enabled Technologies",4],
+["Summer","IP201","Internship-I",3],
+["V","DS303","Blockchain Technology",3,"REDUCE",3],["V","HS301","Constitution of India",0],["V","DS304","Machine Learning",4],["V","CS302","Operating Systems",4],["V","CR301","Power Skills-III",1],["V","CS301","Principles of Cryptography",3],["V","CS303","Programming Language and Compiler Construction",3],["V","CS304","Software Engineering",3],
+["VI","DS307","Big Data Systems",3],["VI","CS307","Cloud Computing",4],["VI","CS306","Computer Networks",4],["VI","CS305","Computer Vision",3],["VI","CR302","Power Skills-IV",1],["VI","SP301","Special Project",3],["VI","DS201","Artificial Intelligence",3],
+["VII","CS415","Ethical Hacking",3,"UPDATE"],["VII","DS306","Deep Learning",4,"UPDATE"],["VII","DS311","Natural Language Processing",3,"UPDATE"],["VII","DS401","Human Computer Interaction",3,"UPDATE"],["VII","MG401","Introduction to Entrepreneurship",3,"UPDATE"],
+["VIII","IP-2","Internship-II",15],
+["VI","NEW1","Applied Generative AI and LLMs",3,"ADD",0,1],["VII","NEW2","MLOps and Model Deployment Lab",3,"ADD",0,1],["VII","NEW3","Cloud and Container Security Lab",2,"ADD",0,1],["V","NEW4","Human-AI Interaction and Accessible Design Studio",2,"ADD",0,1]
+].map(r=>({sem:r[0],code:r[1],title:r[2],cr:r[3],act:r[4]||(r[6]?"ADD":"KEEP"),d:r[5]||0,isNew:!!r[6]}));
+const $=id=>document.getElementById(id);
+[...new Set(D.map(r=>r.sem))].forEach(s=>$("fs").add(new Option(s,s)));
+function calc(){
+ let base=0,rem=0,add=0,aff=0;
+ D.forEach(r=>{
+  if(!r.isNew)base+=r.cr;
+  if(r.act==="REDUCE"){rem+=r.d;aff+=r.d}
+  else if(r.act==="UPDATE"){aff+=r.cr}
+  else if(r.act==="ADD"){add+=r.cr;aff+=r.cr}
+ });
+ const bal=add-rem,pct=base?aff/base*100:0;
+ $("base").textContent=base;$("rem").textContent=rem;$("add").textContent=add;$("tot").textContent=base-rem+add;
+ $("bal").textContent=(bal>0?"+":"")+bal;$("bal").className=bal===0?"ok":"bad";
+ $("balt").textContent=bal===0?"Balanced":"Not balanced";
+ $("aff").textContent=aff;$("aff").className=pct>=20&&pct<=25?"ok":"bad";
+ $("pct").textContent="Affected ("+pct.toFixed(1)+"%)";
+ const S={};D.forEach(r=>{const o=S[r.sem]||(S[r.sem]={b:0,r:0,a:0});if(!r.isNew)o.b+=r.cr;if(r.act==="REDUCE")o.r+=r.d;if(r.act==="ADD")o.a+=r.cr});
+ $("sems").innerHTML=Object.keys(S).map(k=>{const o=S[k];return `<tr><td>${k}</td><td class="n">${o.b}</td><td class="n">-${o.r}</td><td class="n">+${o.a}</td><td class="n">${o.b-o.r+o.a}</td></tr>`}).join("");
+}
+function draw(){
+ const s=$("fs").value,a=$("fa").value,q=$("q").value.toLowerCase();
+ $("rows").innerHTML="";
+ D.forEach((r,i)=>{
+  if(s&&r.sem!==s||a&&r.act!==a||q&&!(r.code+" "+r.title).toLowerCase().includes(q))return;
+  const tr=document.createElement("tr");tr.className=r.act;
+  const opts=(r.isNew?["ADD","SKIP"]:["KEEP","UPDATE","REDUCE"]).map(o=>`<option${o===r.act?" selected":""}>${o}</option>`).join("");
+  tr.innerHTML=`<td>${r.sem}</td><td>${r.code}</td><td>${r.title}</td><td class="n">${r.cr}</td><td><select aria-label="Action for ${r.code}">${opts}</select></td><td>${r.act==="REDUCE"?`<input type="number" min="0" max="${r.cr}" value="${r.d}" aria-label="Credits removed from ${r.code}">`:""}</td>`;
+  tr.querySelector("select").onchange=e=>{r.act=e.target.value;if(r.act==="REDUCE"&&!r.d)r.d=1;calc();draw()};
+  const inp=tr.querySelector("input");
+  if(inp)inp.oninput=e=>{r.d=Math.max(0,Math.min(r.cr,+e.target.value||0));calc()};
+  $("rows").appendChild(tr);
+ });
+}
+["fs","fa","q"].forEach(id=>$(id).addEventListener("input",draw));
+calc();draw();
+</script>
+</body>
+</html>

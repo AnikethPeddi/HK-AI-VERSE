@@ -1,0 +1,47 @@
+# AI-use record (Task 2)
+
+**Who ran these.** The five exercises below were run by Claude (Claude Sonnet 5.5, claude.ai chat) on 24 Oct 2026 at my request, and checked with code or sources where the check was possible. I did not write the outputs. Each entry says what was checked and what was not. Every exercise is authorized, non-confidential and uses invented data. The Ethical Hacking exercise is conceptual only, with no attack commands and nothing run against a network.
+**Student re-check.** On 24 Oct 2026 I ran `verification/exercise-checks.py` myself. Output: V 7, c(cat) 2, c(cat sat) 1, P 0.2222, MLE 0.5; max abs diff analytic vs numeric 1.048e-10; loss 0.6947 before and 0.6653 after one step; break-even users 750.0, revenue 150000.0. These match exercises 1, 2 and 5 below. Exercises 3 and 4 and the Kneser-Ney and DNS statements are not re-checked by me.
+
+## 1. NLP (DS311): smoothing
+- Date and model: 24 Oct 2026, Claude Sonnet 5.5.
+- Prompt: "Explain add-one (Laplace) smoothing and Kneser-Ney smoothing for bigram language models in plain language. Then use this toy corpus (with <s> and </s> markers): 'the cat sat', 'the cat ate', 'a dog sat'. Compute the add-one probability P(sat | cat) and say which vocabulary you used."
+- Output (saved): Add-one smoothing pretends every possible bigram was seen once more than it was: P(w | prev) = (count(prev, w) + 1) / (count(prev) + V). It removes zero probabilities but takes too much mass from seen bigrams when V is large. Kneser-Ney subtracts a fixed discount (often about 0.75) from every seen count and gives the freed mass to a lower-order distribution based on how many different words a word follows, not how often it appears. For example, "Francisco" is frequent but almost always follows "San", so it gets a low continuation probability. For the toy corpus: count(cat sat) = 1, count(cat) = 2, and the vocabulary is {the, cat, sat, ate, a, dog, </s>}, so V = 7 (<s> is never predicted). P(sat | cat) = (1 + 1) / (2 + 7) = 2/9, about 0.222, against 0.5 without smoothing. If <s> were counted in V, the answer would be 2/10 = 0.2, so the vocabulary choice must be stated.
+- Verification: Python counted V = 7, count(cat) = 2, count(cat sat) = 1, smoothed P = 0.2222 and unsmoothed P = 0.5 (script in verification/). The Kneser-Ney description was not checked against a source in this session; it should be compared with the smoothing chapter of Jurafsky and Martin, the course textbook, before relying on it.
+- Errors found: none in the arithmetic. The vocabulary convention is a judgment call, flagged in the output itself.
+- Student re-run (24 Oct 2026): the script printed V 7, c(cat) 2, c(cat sat) 1, P 0.2222, MLE 0.5, as stated above.
+- What the model did / what human checking remains: it explained and calculated. A human must confirm the Kneser-Ney description against the textbook.
+
+## 2. Deep Learning (DS306): gradient and one training step
+- Date and model: 24 Oct 2026, Claude Sonnet 5.5.
+- Prompt: "Derive the gradient of binary cross-entropy loss with respect to the logit z for a sigmoid output, then write NumPy code for one gradient descent step on a two-layer network with a tanh hidden layer and sigmoid output."
+- Output (saved): With L = -[y log s(z) + (1-y) log(1 - s(z))] and ds/dz = s(1 - s), dL/dz = -y(1 - s) + (1 - y)s = s(z) - y. Averaged over N examples the gradient is (s(z) - y)/N. Backpropagation then gives dW2 = h^T dz, db2 = sum(dz), dh = dz W2^T, da = dh * (1 - h^2), dW1 = X^T da, db1 = sum(da), and each parameter moves by minus the learning rate times its gradient. Code: the `grads` and update lines in verification/exercise-checks.py.
+- Verification: a finite-difference gradient check on all four parameter groups of a small random network gave a maximum absolute difference of 1.05e-10 against the analytic gradients. One step with learning rate 0.5 lowered the loss from 0.6947 to 0.6653.
+- Errors found: none. The derivation assumes a mean-reduced loss, which the output states.
+- Student re-run (24 Oct 2026): max abs diff 1.048e-10; loss 0.6947 to 0.6653 after one step. Reproduced.
+- What the model did / what human checking remains: it derived and wrote the code; I re-ran the numeric check myself.
+
+## 3. HCI (DS401): heuristic evaluation
+- Date and model: 24 Oct 2026, Claude Sonnet 5.5.
+- Prompt: "Here is a synthetic hostel leave form: Student ID (typed by the user), Out date and In date (plain text boxes with no format hint), Destination, Reason (free text), Contact number, and one Submit button. After an error a popup says 'Error 12'. There is no status page after submitting. Do a Nielsen heuristic evaluation and rate each issue's severity from 0 to 4."
+- Output (saved): Visibility of system status: no status after submitting (severity 3). Help users recognize, diagnose and recover from errors: "Error 12" names no field or fix (3). User control and freedom: no way to edit or cancel after submitting (3). Error prevention: free-text dates invite wrong formats (3). Recognition rather than recall: the user types a Student ID the system already knows, and must remember the date format (2). Help and documentation: nothing explains cut-off times or rules (2). Flexibility and efficiency of use: no way to reuse a previous destination (1). Match between system and the real world, consistency and standards, aesthetic and minimalist design: no clear problem seen (0).
+- Verification: the ten heuristic names were checked on 24 Oct 2026 against the lists on the University of Alberta CIRCA page and the Nielsen Norman Group pages found by search. All ten names match. The severity ratings are my judgment calls and were not independently verified.
+- Errors found: none in the names. Severity scores are subjective.
+- What the model did / what human checking remains: it applied the heuristics; a human should walk through the form (or ask a peer) and agree or change each severity.
+
+## 4. Ethical Hacking (CS415): ARP versus DNS spoofing (conceptual only)
+- Date and model: 24 Oct 2026, Claude Sonnet 5.5.
+- Prompt: "At a conceptual level, how do ARP spoofing and DNS spoofing differ, and which detection and mitigation controls apply? No attack commands or tool usage."
+- Output (saved): ARP spoofing works at the link layer on a local network: forged ARP replies make a victim map another host's IP address to the attacker's MAC address, which ARP allows because it has no authentication, so the attacker can sit in the middle of local traffic. DNS spoofing attacks name resolution: a false answer (for example in a poisoned resolver cache) sends users to the wrong IP address, and it need not be on the victim's local segment. Detection for ARP: several IPs mapped to one MAC, unsolicited ARP replies, and changes in the gateway's MAC. Detection for DNS: unexpected changes in answers and DNSSEC validation failures. Mitigation for ARP: dynamic ARP inspection with DHCP snooping on switches, static entries for key hosts, segmentation, and encrypting traffic so interception is not enough. Mitigation for DNS: DNSSEC, encrypted DNS, patched resolvers with randomised ports, and strict certificate checking.
+- Verification: the ARP statements about no authentication, the detection indicators (multiple IPs to one MAC, unsolicited ARP replies) and the mitigations of limiting cache updates on gratuitous replies and encrypting traffic match MITRE ATT&CK technique T1557.002 and detection DET0387 (attack.mitre.org, accessed 24 Oct 2026). The MITRE pages did not list dynamic ARP inspection, and the DNS statements were not checked in this session; both need checking against the course text or NIST guidance.
+- Errors found: none confirmed. Two parts remain unverified.
+- What the model did / what human checking remains: it summarized concepts; a human must verify the unchecked parts. Nothing was tested on any network.
+
+## 5. Entrepreneurship (MG401): lean canvas and break-even
+- Date and model: 24 Oct 2026, Claude Sonnet 5.5.
+- Prompt: "Using invented numbers (fixed cost 120,000 rupees a year, price 200 rupees per student per year, variable cost 40 rupees per student per year), build a lean canvas for a campus leave-tracker tool and calculate break-even."
+- Output (saved): Problem: paper leave forms need six signatures and give no status. Customer segment: hostel wardens' offices and hostelers. Value proposition: one-page digital pass and live status. Solution: tracker with statuses, an audit record and a paper fallback. Channels: through the college office. Revenue: 200 rupees per student per year. Costs: 120,000 fixed a year (hosting, support) and 40 per student. Key metrics: time per leave and share of leaves handled digitally. Unfair advantage: built by someone who uses the process (weak). Break-even = 120,000 / (200 - 40) = 750 students, or 150,000 rupees of revenue, which is 18.75% of about 4,000 hostelers. A college may prefer a flat fee over per-student pricing.
+- Verification: Python gave 750.0 students and 150,000 revenue; 750/4,000 = 18.75% (verification/).
+- Student re-run (24 Oct 2026): break-even 750.0 users, revenue 150000.0. Reproduced.
+- Errors found: none in the arithmetic. The "unfair advantage" is weak, as the output says, and the per-student pricing is a doubtful assumption.
+- What the model did / what human checking remains: arithmetic and structure; a human must judge whether the assumptions are realistic.
