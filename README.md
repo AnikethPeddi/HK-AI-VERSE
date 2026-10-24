@@ -21,7 +21,7 @@ Individual student work, not an official ICFAI or IFHE document. Synthetic or pe
 ## Review revision (fill after creating the release)
 - Repository: https://github.com/AnikethPeddi/HK-AI-VERSE
 - Named release: round2-submission (https://github.com/AnikethPeddi/HK-AI-VERSE/releases/tag/round2-submission)
-- Full commit URL: PASTE-FULL-COMMIT-URL-HERE
+- Full commit URL: https://github.com/AnikethPeddi/HK-AI-VERSE/commit/a1eef32e3282f07dd6f8963bf499e987bf3a7700
 
 ## AI-use disclosure
 I used Claude (Anthropic) between 22 and 24 October 2026 to draft the reports, tables, calculator and capstone, to read the official programme page, to find the job postings, and to run the five AI exercises in task2/ai-use-record.md. I supplied the course material, my credit data and the process knowledge, and the reports label guesses as guesses. I have not yet re-run the exercises myself.
